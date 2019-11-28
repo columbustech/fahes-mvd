@@ -6,7 +6,7 @@ from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.parsers import JSONParser
 
-import requests, os
+import requests, os, subprocess, csv
 
 # Create your views here.
 class Upload(APIView):
@@ -23,6 +23,52 @@ class Upload(APIView):
             f.write(response.content)
         
         return Response(status=status.HTTP_201_CREATED)
+
+class Execute(APIView):
+    parser_class = (JSONParser,)
+
+    @csrf_exempt
+    def post(self, request):
+        name = request.data['name']
+
+        fahes_path = '/storage/' + name
+        output_path = '/storage/results/'
+        if not os.path.exists('/storage/results'):
+            os.mkdir('/storage/results')
+
+        subprocess.call(['/fahes_build/FAHES', fahes_path, output_path, '4'])
+
+        return Response(status=status.HTTP_200_OK)
+
+class Results(APIView):
+    parser_class = (JSONParser,)
+
+    def get(self, request):
+        name = "DMV_" + request.query_params['name']
+        path = '/storage/results/' + name
+
+        data = []
+        with open(path) as csvfile:
+            csvReader = csv.DictReader(csvfile)
+            for row in csvReader:
+                data.append(row)
+        return Response(data, status=status.HTTP_200_OK)
+
+class Save(APIView):
+    parser_class = (JSONParser,)
+
+    @csrf_exempt
+    def post(self, request, format=None):
+        access_token = request.data['access_token']
+        name = "DMV_" + request.data['name']
+        path = request.data['path']
+
+        container_path = '/storage/results/' + name
+        with open(container_path, 'rb') as f:
+            file_arg = {'file': (name, f), 'path': (None, path)}
+            response = requests.post('https://api.cdrive.columbusecosystem.com/upload/', files=file_arg, headers={'Authorization':'Bearer ' + access_token})
+
+        return Response(status=status.HTTP_200_OK)
 
 class ClientId(APIView):
     parser_class = (JSONParser,)

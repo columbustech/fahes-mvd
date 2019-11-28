@@ -1,7 +1,7 @@
 import React from 'react';
 import Cookies from 'universal-cookie';
 import axios from 'axios';
-import { Modal, Button } from 'react-bootstrap';
+import { Button } from 'react-bootstrap';
 import { FaFile, FaFolder } from 'react-icons/fa';
 
 class CDrivePathSelector extends React.Component {
@@ -53,8 +53,7 @@ class CDrivePathSelector extends React.Component {
       }
   }
   selectFile() {
-    this.onPathChange(this.state.path + "/" + this.state.driveObjects[this.state.selectedIndex].name);
-    this.toggle();
+    this.props.onPathSelect(this.state.path + "/" + this.state.driveObjects[this.state.selectedIndex].name);
   }
   render() {
     var tokens = this.state.path.split("/");
@@ -98,29 +97,19 @@ class CDrivePathSelector extends React.Component {
       );
     }
     return(
-      <Modal show={this.props.show} onHide={this.props.toggle}>
-        <Modal.Header closeButton>
-          <Modal.Title>Select CSV File</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          <nav aria-label="breadcrumb">
-            <ol className="breadcrumb bg-transparent">
-              {items}
-            </ol>
-          </nav>
-          <div className="folder-list">
-            {folderList}
-          </div>
-        </Modal.Body>
-        <Modal.Footer>
-          <Button variant="secondary" onClick={this.props.toggle}>
-            Close
-          </Button>
-          <Button variant="primary" onClick={this.selectFile}>
-            Select
-          </Button>
-        </Modal.Footer>
-      </Modal>
+      <div>
+        <nav aria-label="breadcrumb">
+          <ol className="breadcrumb bg-transparent">
+            {items}
+          </ol>
+        </nav>
+        <div className="folder-list">
+          {folderList}
+        </div>
+        <Button variant="primary" onClick={this.selectFile}>
+          Select
+        </Button>
+      </div>
     );
   }
 }

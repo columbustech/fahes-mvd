@@ -1,0 +1,7 @@
+.csv-table {
+  width: 50%;
+  height: 50%;
+  margin-top: 30px;
+  margin-left: 20%;
+  overflow: auto;
+}
