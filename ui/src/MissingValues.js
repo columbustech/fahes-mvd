@@ -9,7 +9,8 @@ class MissingValues extends React.Component {
     this.state = {
       isExecuting: true,
       jsondata: [],
-      cdrivePath: ""
+      cdrivePath: "",
+      isSaved: false
     };
     this.handlePathChange = this.handlePathChange.bind(this);
     this.saveToCdrive = this.saveToCdrive.bind(this);
@@ -55,14 +56,22 @@ class MissingValues extends React.Component {
     });
     request.then(
         response => {
-          //this.setState({isSaved: true});
-          console.log("Saved to CDrive");
+          this.setState({isSaved: true});
         },
     );
   }
   render() {
     if(this.state.isExecuting) {
-      return(null);
+      return (
+        <div className="size-hundred">
+          <div className="size-hundred flex-div">
+            <div className="spinner-border text-info m-auto" style={{width: "100px", height: "100px"}} role="status">
+              <span className="sr-only">Loading...</span>
+            </div>
+          </div>
+          <div className="text-info text-center m-auto">Detecting missing values ... </div>
+        </div>
+      );
     } else {
       var keys = Object.keys(this.state.jsondata[0]);
 
@@ -83,14 +92,24 @@ class MissingValues extends React.Component {
 
       var downloadLinks = 
         <div>
-          <button className="btn btn-primary">Download to Local</button>
-          <div class="input-group mt-3">
-            <input type="text" placeholder="Enter CDrive Path" value={this.state.cdrivePath} onChange={this.handlePathChange} />
+          <div class="input-group mt-3 mx-auto w-75">
+            <input type="text" placeholder="Enter CDrive Path" className="text-input" value={this.state.cdrivePath} onChange={this.handlePathChange} />
             <div class="input-group-append">
               <button className="btn btn-primary btn-lg" onClick={this.saveToCdrive}> Save to CDrive </button> 
             </div>
+            <div class="input-group-append ml-2">
+              <button className="btn btn-secondary btn-lg">Download to Local</button>
+            </div>
           </div>
         </div> ;
+
+      let cdriveLink;
+      if(this.state.isSaved) {
+        cdriveLink = 
+          <div className="h4 mt-3 font-weight-light text-center" >
+            Saved! <a href="https://cdrive.columbusecosystem.com"> View in CDrive</a>
+          </div> ;
+      }
       return (
         <div>
           <div className="csv-table" >
@@ -106,6 +125,7 @@ class MissingValues extends React.Component {
             </table>
           </div>
           {downloadLinks}
+          {cdriveLink}
         </div>
       );
     }

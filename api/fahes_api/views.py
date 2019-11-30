@@ -70,12 +70,18 @@ class Save(APIView):
 
         return Response(status=status.HTTP_200_OK)
 
-class ClientId(APIView):
+class Specs(APIView):
     parser_class = (JSONParser,)
 
     def get(self, request):
-        client_id = os.environ['COLUMBUS_CLIENT_ID']
-        return Response({"client_id": client_id})
+        data = {
+            'clientId': os.environ['COLUMBUS_CLIENT_ID'],
+            'authUrl': os.environ['AUTHENTICATION_URL'],
+            'cdriveUrl': os.environ['CDRIVE_URL'],
+            'cdriveApiUrl': os.environ['CDRIVE_API_URL'],
+            'username': os.environ['COLUMBUS_USERNAME']
+        }
+        return Response(data, status=status.HTTP_200_OK)
 
 class AuthenticationToken(APIView):
     parser_class = (JSONParser,)
